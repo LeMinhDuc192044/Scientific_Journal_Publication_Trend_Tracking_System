@@ -1,4 +1,7 @@
 
+using Microsoft.EntityFrameworkCore;
+using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Persistence;
+
 namespace Scientific_Journal_Publication_Trend_Tracking_System
 {
     public class Program
@@ -8,6 +11,10 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseNpgsql(
+                    builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

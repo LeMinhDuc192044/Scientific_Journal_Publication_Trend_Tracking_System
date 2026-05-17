@@ -28,6 +28,9 @@ obj/
 # =========================
 *.nupkg
 packages/
+*.nuget.dgspec.json
+project.assets.json
+project.nuget.cache
 
 # =========================
 # Logs

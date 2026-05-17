@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Scientific_Journal_Publication_Trend_Tracking_System")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+931b95f0224f9dff0d1a8707528672123c93dd9b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1ad1ad81e03c2035a4df342862018cc99f5903a4")]
 [assembly: System.Reflection.AssemblyProductAttribute("Scientific_Journal_Publication_Trend_Tracking_System")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Scientific_Journal_Publication_Trend_Tracking_System")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

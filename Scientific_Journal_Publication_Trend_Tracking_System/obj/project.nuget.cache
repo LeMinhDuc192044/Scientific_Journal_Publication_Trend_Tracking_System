@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "kWwCaHW9nRo=",
+  "dgSpecHash": "Hxb0euIATas=",
   "success": true,
-  "projectFilePath": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System.csproj",
+  "projectFilePath": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Assigment\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\admin\\.nuget\\packages\\automapper\\15.1.3\\automapper.15.1.3.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",

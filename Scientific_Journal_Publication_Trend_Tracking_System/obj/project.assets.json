@@ -580,13 +580,13 @@
           "lib/netstandard2.0/_._": {}
         }
       },
-      "Microsoft.EntityFrameworkCore.Design/8.0.0": {
+      "Microsoft.EntityFrameworkCore.Design/8.0.27": {
         "type": "package",
         "dependencies": {
           "Humanizer.Core": "2.14.1",
           "Microsoft.CodeAnalysis.CSharp.Workspaces": "4.5.0",
-          "Microsoft.EntityFrameworkCore.Relational": "8.0.0",
-          "Microsoft.Extensions.DependencyModel": "8.0.0",
+          "Microsoft.EntityFrameworkCore.Relational": "8.0.27",
+          "Microsoft.Extensions.DependencyModel": "8.0.2",
           "Mono.TextTemplating": "2.2.1"
         },
         "compile": {
@@ -603,10 +603,10 @@
           "build/net8.0/Microsoft.EntityFrameworkCore.Design.props": {}
         }
       },
-      "Microsoft.EntityFrameworkCore.Relational/8.0.11": {
+      "Microsoft.EntityFrameworkCore.Relational/8.0.27": {
         "type": "package",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore": "8.0.11",
+          "Microsoft.EntityFrameworkCore": "8.0.27",
           "Microsoft.Extensions.Configuration.Abstractions": "8.0.0"
         },
         "compile": {
@@ -843,12 +843,8 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
-      "Microsoft.Extensions.DependencyModel/8.0.0": {
+      "Microsoft.Extensions.DependencyModel/8.0.2": {
         "type": "package",
-        "dependencies": {
-          "System.Text.Encodings.Web": "8.0.0",
-          "System.Text.Json": "8.0.0"
-        },
         "compile": {
           "lib/net8.0/_._": {
             "related": ".xml"
@@ -2534,25 +2530,26 @@
         "microsoft.entityframeworkcore.analyzers.nuspec"
       ]
     },
-    "Microsoft.EntityFrameworkCore.Design/8.0.0": {
-      "sha512": "94reKYu63jg4O75UI3LMJHwOSi8tQ6IfubiZhdnSsWcgtmAuF8OyLfjK/MIxuvaQRJZAF6E747FIuxjOtb8/og==",
+    "Microsoft.EntityFrameworkCore.Design/8.0.27": {
+      "sha512": "Pe+TpzQTow3Ql1UFcQ7M8fJ7dpzfW4gVYtY/wWLMfArWWpDfKkDWhmJS5d02YZnDIl9rtfw0eMGqLy40pezUWg==",
       "type": "package",
-      "path": "microsoft.entityframeworkcore.design/8.0.0",
+      "path": "microsoft.entityframeworkcore.design/8.0.27",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
+        "PACKAGE.md",
         "build/net8.0/Microsoft.EntityFrameworkCore.Design.props",
         "lib/net8.0/Microsoft.EntityFrameworkCore.Design.dll",
         "lib/net8.0/Microsoft.EntityFrameworkCore.Design.xml",
-        "microsoft.entityframeworkcore.design.8.0.0.nupkg.sha512",
+        "microsoft.entityframeworkcore.design.8.0.27.nupkg.sha512",
         "microsoft.entityframeworkcore.design.nuspec"
       ]
     },
-    "Microsoft.EntityFrameworkCore.Relational/8.0.11": {
-      "sha512": "3TuuW3i5I4Ro0yoaHmi2MqEDGObOVuhLaMEnd/heaLB1fcvm4fu4PevmC4BOWnI0vo176AIlV5o4rEQciLoohw==",
+    "Microsoft.EntityFrameworkCore.Relational/8.0.27": {
+      "sha512": "ulztr0Jcvzg6bbL8wuwshVKcuU4GMeObvSJopg9KM/MBHwEcOroawdoYOJKmcmfmIp2dfXCl0n/qNRLfBfJwZg==",
       "type": "package",
-      "path": "microsoft.entityframeworkcore.relational/8.0.11",
+      "path": "microsoft.entityframeworkcore.relational/8.0.27",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2560,7 +2557,7 @@
         "PACKAGE.md",
         "lib/net8.0/Microsoft.EntityFrameworkCore.Relational.dll",
         "lib/net8.0/Microsoft.EntityFrameworkCore.Relational.xml",
-        "microsoft.entityframeworkcore.relational.8.0.11.nupkg.sha512",
+        "microsoft.entityframeworkcore.relational.8.0.27.nupkg.sha512",
         "microsoft.entityframeworkcore.relational.nuspec"
       ]
     },
@@ -3126,10 +3123,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Extensions.DependencyModel/8.0.0": {
-      "sha512": "NSmDw3K0ozNDgShSIpsZcbFIzBX4w28nDag+TfaQujkXGazBm+lid5onlWoCBy4VsLxqnnKjEBbGSJVWJMf43g==",
+    "Microsoft.Extensions.DependencyModel/8.0.2": {
+      "sha512": "mUBDZZRgZrSyFOsJ2qJJ9fXfqd/kXJwf3AiDoqLD9m6TjY5OO/vLNOb9fb4juC0487eq4hcGN/M2Rh/CKS7QYw==",
       "type": "package",
-      "path": "microsoft.extensions.dependencymodel/8.0.0",
+      "path": "microsoft.extensions.dependencymodel/8.0.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3151,7 +3148,7 @@
         "lib/net8.0/Microsoft.Extensions.DependencyModel.xml",
         "lib/netstandard2.0/Microsoft.Extensions.DependencyModel.dll",
         "lib/netstandard2.0/Microsoft.Extensions.DependencyModel.xml",
-        "microsoft.extensions.dependencymodel.8.0.0.nupkg.sha512",
+        "microsoft.extensions.dependencymodel.8.0.2.nupkg.sha512",
         "microsoft.extensions.dependencymodel.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -4379,6 +4376,7 @@
       "MediatR.Extensions.Microsoft.DependencyInjection >= 11.0.0",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 8.0.0",
       "Microsoft.EntityFrameworkCore >= 8.0.27",
+      "Microsoft.EntityFrameworkCore.Design >= 8.0.27",
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.0",
       "Microsoft.Extensions.Caching.StackExchangeRedis >= 8.0.0",
       "Microsoft.Extensions.Configuration.Json >= 8.0.0",
@@ -4397,11 +4395,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System.csproj",
+      "projectUniqueName": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System.csproj",
       "projectName": "Scientific_Journal_Publication_Trend_Tracking_System",
-      "projectPath": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System.csproj",
+      "projectPath": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System.csproj",
       "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\obj\\",
+      "outputPath": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -4435,7 +4433,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "10.0.200"
     },
     "frameworks": {
       "net8.0": {
@@ -4482,6 +4480,12 @@
             "version": "[8.0.0, )"
           },
           "Microsoft.EntityFrameworkCore": {
+            "target": "Package",
+            "version": "[8.0.27, )"
+          },
+          "Microsoft.EntityFrameworkCore.Design": {
+            "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+            "suppressParent": "All",
             "target": "Package",
             "version": "[8.0.27, )"
           },
@@ -4535,6 +4539,24 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.27, 8.0.27]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[8.0.27, 8.0.27]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.27, 8.0.27]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[8.0.27, 8.0.27]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -4543,7 +4565,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.313/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.204/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

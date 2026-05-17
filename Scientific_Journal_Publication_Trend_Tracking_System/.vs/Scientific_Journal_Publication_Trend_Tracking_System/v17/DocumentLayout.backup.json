@@ -1,25 +1,17 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\",
+  "WorkspaceRootPath": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|c:\\users\\admin\\desktop\\2026\\semester_8\\prn393\\project\\scientific_journal_publication_trend_tracking_system\\src\\domain\\entities\\author.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|solutionrelative:src\\domain\\entities\\author.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|c:\\users\\admin\\desktop\\2026\\semester_8\\prn393\\scientific_journal_publication_trend_tracking_system\\scientific_journal_publication_trend_tracking_system\\.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|solutionrelative:.gitignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|c:\\users\\admin\\desktop\\2026\\semester_8\\prn393\\project\\scientific_journal_publication_trend_tracking_system\\src\\domain\\entities\\apidatasource.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|solutionrelative:src\\domain\\entities\\apidatasource.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|c:\\users\\admin\\desktop\\2026\\semester_8\\prn393\\scientific_journal_publication_trend_tracking_system\\scientific_journal_publication_trend_tracking_system\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|c:\\users\\admin\\desktop\\2026\\semester_8\\prn393\\project\\scientific_journal_publication_trend_tracking_system\\contributing.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
-      "RelativeMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|solutionrelative:contributing.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|c:\\users\\admin\\desktop\\2026\\semester_8\\prn393\\project\\scientific_journal_publication_trend_tracking_system\\src\\infrastructure\\persistence\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|solutionrelative:src\\infrastructure\\persistence\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|c:\\users\\admin\\desktop\\2026\\semester_8\\prn393\\project\\scientific_journal_publication_trend_tracking_system\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|c:\\users\\admin\\desktop\\2026\\semester_8\\prn393\\scientific_journal_publication_trend_tracking_system\\scientific_journal_publication_trend_tracking_system\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8F650629-0AA0-43BA-988C-77AA1FE79C1D}|Scientific_Journal_Publication_Trend_Tracking_System.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -30,32 +22,46 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Author.cs",
-              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\src\\Domain\\Entities\\Author.cs",
-              "RelativeDocumentMoniker": "src\\Domain\\Entities\\Author.cs",
-              "ToolTip": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\src\\Domain\\Entities\\Author.cs",
-              "RelativeToolTip": "src\\Domain\\Entities\\Author.cs",
-              "ViewState": "AgIAAAUAAAAAAAAAAAAxwAkAAAAmAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-15T03:56:56.616Z",
+              "WhenOpened": "2026-05-15T03:53:07.765Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": ".gitignore",
+              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System\\.gitignore",
+              "RelativeDocumentMoniker": ".gitignore",
+              "ToolTip": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System\\.gitignore",
+              "RelativeToolTip": ".gitignore",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAAE4AAAAFAAAAAAAAAA==",
+              "Icon": "00000000-0000-0000-0000-000000000000.000000|iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAF8SURBVDhPjVNLTgJBEG1lwpoFB3GNK9fieA48hD8iwT/ihwgSDAIHgAGXXsEV18CNzL/LquqZdsYM6kteXqcy3fWqpmpNRBgOhyABBEgpAFVKPIMUcYzUyOU\u002BXM/b2qtU3vkSfRjjZTCAMAw1A2LwzdFoBPP5HNqdzuL27n4juibWI\u002BUshBA1DIkhEx9iEorFotgslQqGYbxxAGFEqt1MxmPWJLbLZdZ\u002Bv89q5PMFPiTR6z2zdaxR0fXA0XTBcVywkb4fwHXjRteecIDNQ7UmExVYAdPcxYaqclN46na5WenMKjtlVnTYwcXlVYaDqImW9beD5N/TeGy32QHXm6hZ03ZgiSQHp2fnWQ4oBmJqWSqwAqZpZjt4aLXAD4J0VqyZsmoubfB8H2r1eoaD6NXZ9HcHO\u002BSA3f4AjifXl8rItOETM8ckB9WTWpYD9RdeZ1PWVWAHWXPQaDb59f/w8LiqHeh1pvGkCaP6qB8yXusoxmuNZ7XmII4O9vGuEF86osuDYRkpYQAAAABJRU5ErkJggg==",
+              "WhenOpened": "2026-05-17T09:27:44.935Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "ApiDataSource.cs",
-              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\src\\Domain\\Entities\\ApiDataSource.cs",
-              "RelativeDocumentMoniker": "src\\Domain\\Entities\\ApiDataSource.cs",
-              "ToolTip": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\src\\Domain\\Entities\\ApiDataSource.cs",
-              "RelativeToolTip": "src\\Domain\\Entities\\ApiDataSource.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAAA3wAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-15T03:56:48.388Z",
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Scientific_Journal_Publication_Trend_Tracking_System\\Scientific_Journal_Publication_Trend_Tracking_System\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-05-17T09:22:46.142Z",
               "EditorCaption": ""
             },
             {
@@ -63,43 +69,8 @@
               "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "AppDbContext.cs",
-              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\src\\Infrastructure\\Persistence\\AppDbContext.cs",
-              "RelativeDocumentMoniker": "src\\Infrastructure\\Persistence\\AppDbContext.cs",
-              "ToolTip": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\src\\Infrastructure\\Persistence\\AppDbContext.cs",
-              "RelativeToolTip": "src\\Infrastructure\\Persistence\\AppDbContext.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-15T03:54:59.451Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAABkAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-15T03:53:07.765Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "CONTRIBUTING.md",
-              "DocumentMoniker": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\CONTRIBUTING.md",
-              "RelativeDocumentMoniker": "CONTRIBUTING.md",
-              "ToolTip": "C:\\Users\\admin\\Desktop\\2026\\Semester_8\\PRN393\\Project\\Scientific_Journal_Publication_Trend_Tracking_System\\CONTRIBUTING.md",
-              "RelativeToolTip": "CONTRIBUTING.md",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
-              "WhenOpened": "2026-05-15T03:53:07.098Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             }
           ]
         }

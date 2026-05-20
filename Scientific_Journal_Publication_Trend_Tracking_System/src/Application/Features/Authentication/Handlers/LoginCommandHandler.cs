@@ -44,14 +44,14 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
         if (user == null)
         {
             _logger.LogWarning("Login failed: User not found for email {Email}", request.Email);
-            throw new UnauthorizedException(ValidationMessages.EmailInvalid);
+            throw new UnauthorizedException(ValidationMessages.InvalidCredentials);
         }
 
         // Verify password
         if (!_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
         {
             _logger.LogWarning("Login failed: Invalid password for email {Email}", request.Email);
-            throw new UnauthorizedException(ValidationMessages.PasswordRequired);
+            throw new UnauthorizedException(ValidationMessages.InvalidCredentials);
         }
 
         // Generate tokens

@@ -37,6 +37,12 @@ public class ConflictException : ApplicationException
     public ConflictException(string message) : base(message) { }
 }
 
+public class ForbiddenAccessException : ApplicationException
+{
+    public ForbiddenAccessException(string message) : base(message) { }
+
+}
+
 public class InternalServerException : ApplicationException
 {
     public InternalServerException(string message) : base(message) { }

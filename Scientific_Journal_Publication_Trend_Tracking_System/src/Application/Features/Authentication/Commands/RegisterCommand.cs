@@ -1,9 +1,10 @@
 using MediatR;
 using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.DTOs;
+using Scientific_Journal_Publication_Trend_Tracking_System.Domain.Enums;
 
 namespace Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.Commands;
 
 /// <summary>
 /// Command for user registration
 /// </summary>
-public record RegisterCommand(string Email, string FullName, string Password) : IRequest<RegisterResponse>;
+public record RegisterCommand(string Email, string FullName, string Password, UserRole Role) : IRequest<RegisterResponse>;

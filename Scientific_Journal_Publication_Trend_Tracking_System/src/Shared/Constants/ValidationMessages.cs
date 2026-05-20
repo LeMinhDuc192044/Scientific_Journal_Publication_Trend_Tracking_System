@@ -25,6 +25,12 @@ public static class ValidationMessages
     public const string RefreshTokenInvalid = "Refresh token is invalid or expired";
     public const string RefreshTokenRevoked = "Refresh token has been revoked";
 
+    // Authentication
+    public const string InvalidCredentials = "Invalid email or password";
+
+    // Authorization
+    public const string AdminRegistrationForbidden = "Admin accounts cannot be created through registration.";
+
     // Research paper validation
     public const string KeywordRequired = "At least one keyword is required";
     public const string AuthorRequired = "Author name is required";

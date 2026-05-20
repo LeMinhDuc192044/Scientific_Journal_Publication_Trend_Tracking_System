@@ -18,18 +18,15 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher _passwordHasher;
-    private readonly IMapper _mapper;
     private readonly ILogger<LoginCommandHandler> _logger;
 
     public RegisterCommandHandler(
         IUnitOfWork unitOfWork,
         IPasswordHasher passwordHasher,
-        IMapper mapper,
         ILogger<LoginCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -46,13 +43,18 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
         }
 
         // Create new user
+        if (request.Role == UserRole.Admin)
+        {
+            _logger.LogWarning("Registration blocked: attempt to self-register as Admin");
+            throw new ForbiddenAccessException(ValidationMessages.AdminRegistrationForbidden);
+        }
         var user = new User
         {
             Id = Guid.NewGuid(),
             Email = request.Email.ToLower(),
             FullName = request.FullName,
             PasswordHash = _passwordHasher.HashPassword(request.Password),
-            Role = UserRole.User,
+            Role = request.Role,
             IsEmailVerified = false,
             IsActive = true
         };

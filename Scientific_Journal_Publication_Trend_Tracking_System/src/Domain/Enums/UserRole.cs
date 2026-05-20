@@ -6,5 +6,6 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.Domain.Enums;
 public enum UserRole
 {
     Admin = 0,
-    User = 1
+    User = 1,
+    Researcher = 2
 }

@@ -1,4 +1,5 @@
 namespace Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.DTOs;
+using Scientific_Journal_Publication_Trend_Tracking_System.Domain.Enums;
 
 /// <summary>
 /// DTO for user registration request
@@ -8,6 +9,7 @@ public record RegisterRequest
     public string Email { get; init; } = string.Empty;
     public string FullName { get; init; } = string.Empty;
     public string Password { get; init; } = string.Empty;
+    public UserRole Role { get; init; } = UserRole.User;
 }
 
 /// <summary>

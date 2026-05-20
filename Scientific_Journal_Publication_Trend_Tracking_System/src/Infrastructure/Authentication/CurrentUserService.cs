@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Authentication;
 
@@ -25,7 +26,7 @@ public class CurrentUserService : ICurrentUserService
     public Guid? GetUserId()
     {
         var userIdClaim = _httpContextAccessor.HttpContext?.User
-            .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            .FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
 
         return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
     }
@@ -33,7 +34,7 @@ public class CurrentUserService : ICurrentUserService
     public string? GetUserEmail()
     {
         return _httpContextAccessor.HttpContext?.User
-            .FindFirst(ClaimTypes.Email)?.Value;
+            .FindFirst(JwtRegisteredClaimNames.Email)?.Value;
     }
 
     public bool IsAuthenticated()
@@ -47,3 +48,4 @@ public class CurrentUserService : ICurrentUserService
             .IsInRole("Admin") ?? false;
     }
 }
+

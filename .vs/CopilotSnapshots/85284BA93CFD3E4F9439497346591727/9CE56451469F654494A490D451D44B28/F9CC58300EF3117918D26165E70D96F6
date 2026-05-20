@@ -1,0 +1,89 @@
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.Commands;
+using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.DTOs;
+using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Authentication;
+using Scientific_Journal_Publication_Trend_Tracking_System.Shared.Results;
+
+namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.Features.Authentication.Controller;
+
+[ApiController]
+[Route("api/auth")]
+[Produces("application/json")]
+public class AuthController : ControllerBase
+{
+    private readonly IMediator _mediator;
+    private readonly ICurrentUserService _currentUserService;
+
+    public AuthController(IMediator mediator, ICurrentUserService currentUserService)
+    {
+        _mediator = mediator;
+        _currentUserService = currentUserService;
+    }
+
+    [HttpPost("register")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ApiResponse<RegisterResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<RegisterResponse>), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ApiResponse<RegisterResponse>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Register(
+        [FromBody] RegisterRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new RegisterCommand(request.Email, request.FullName, request.Password);
+        var result = await _mediator.Send(command, cancellationToken);
+        return CreatedAtAction(nameof(Register), ApiResponse<RegisterResponse>.Created(result));
+    }
+
+    [HttpPost("login")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ApiResponse<LoginResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<LoginResponse>), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Login(
+        [FromBody] LoginRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new LoginCommand(request.Email, request.Password);
+        var result = await _mediator.Send(command, cancellationToken);
+        return Ok(ApiResponse<LoginResponse>.Ok(result, "Login successful"));
+    }
+
+    [HttpPost("refresh-token")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ApiResponse<RefreshTokenResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<RefreshTokenResponse>), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> RefreshToken(
+        [FromBody] RefreshTokenRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new RefreshTokenCommand(request.RefreshToken);
+        var result = await _mediator.Send(command, cancellationToken);
+        return Ok(ApiResponse<RefreshTokenResponse>.Ok(result, "Token refreshed successfully"));
+    }
+
+    [HttpPost("logout")]
+    [Authorize]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+    {
+        var userId = _currentUserService.GetUserId();
+        if (userId == null)
+        {
+            return Unauthorized(ApiResponse.Failure("User not authenticated", 401));
+        }
+
+        // Revoke refresh token
+        var user = await _unitOfWork.Users.GetByIdAsync(userId.Value, cancellationToken);
+        if (user != null)
+        {
+            user.RefreshToken = null;
+            user.RefreshTokenExpiryTime = null;
+            _unitOfWork.Users.Update(user);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+
+        return Ok(ApiResponse.Ok("Logged out successfully"));
+    }
+

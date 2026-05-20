@@ -1,0 +1,104 @@
+﻿using System.Net;
+using System.Text.Json;
+using Scientific_Journal_Publication_Trend_Tracking_System.Shared.Results;
+using FluentValidation;
+using AppValidationException = Scientific_Journal_Publication_Trend_Tracking_System.Shared.Exceptions.ValidationException;
+using AppApplicationException = Scientific_Journal_Publication_Trend_Tracking_System.Shared.Exceptions.ApplicationException;
+using AppUnauthorizedException = Scientific_Journal_Publication_Trend_Tracking_System.Shared.Exceptions.UnauthorizedException;
+using AppConflictException = Scientific_Journal_Publication_Trend_Tracking_System.Shared.Exceptions.ConflictException;
+using AppNotFoundException = Scientific_Journal_Publication_Trend_Tracking_System.Shared.Exceptions.NotFoundException;
+
+namespace Scientific_Journal_Publication_Trend_Tracking_System.Shared.Middleware;
+
+/// <summary>
+/// Global exception handling middleware
+/// </summary>
+public class ExceptionHandlingMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+
+    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "An unhandled exception has occurred: {Message}", exception.Message);
+            await HandleExceptionAsync(context, exception);
+        }
+    }
+
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        context.Response.ContentType = "application/json";
+        var response = context.TraceIdentifier;
+
+        int statusCode;
+        string message;
+        List<string> errors;
+
+        if (exception is AppValidationException appValidationException)
+        {
+            statusCode = StatusCodes.Status400BadRequest;
+            message = "One or more validation failures have occurred.";
+            errors = appValidationException.Errors.Values.SelectMany(x => x).ToList();
+        }
+        else if (exception is AppUnauthorizedException)
+        {
+            statusCode = StatusCodes.Status401Unauthorized;
+            message = exception.Message;
+            errors = new List<string>();
+        }
+        else if (exception is AppConflictException)
+        {
+            statusCode = StatusCodes.Status409Conflict;
+            message = exception.Message;
+            errors = new List<string>();
+        }
+        else if (exception is AppNotFoundException)
+        {
+            statusCode = StatusCodes.Status404NotFound;
+            message = exception.Message;
+            errors = new List<string>();
+        }
+        else if (exception is AppApplicationException)
+        {
+            statusCode = StatusCodes.Status400BadRequest;
+            message = exception.Message;
+            errors = new List<string>();
+        }
+        else
+        {
+            statusCode = StatusCodes.Status500InternalServerError;
+            message = "An internal server error occurred.";
+            errors = new List<string>();
+        }
+
+        context.Response.StatusCode = statusCode;
+
+        var apiResponse = new ApiResponse
+        {
+            Success = false,
+            Message = message,
+            Error = new ErrorDetails
+            {
+                StatusCode = statusCode,
+                Message = message,
+                ValidationErrors = errors.Count > 0 ? errors : null,
+                ExceptionType = exception.GetType().Name
+            },
+            TraceId = response
+        };
+
+        return context.Response.WriteAsJsonAsync(apiResponse);
+    }
+}

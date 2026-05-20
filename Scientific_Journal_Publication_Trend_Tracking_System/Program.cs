@@ -1,6 +1,16 @@
 
+using FluentValidation;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.Validators;
+using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Authentication;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Persistence;
+using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Persistence.Repositories;
+using Scientific_Journal_Publication_Trend_Tracking_System.Shared.Middleware;
+using Scientific_Journal_Publication_Trend_Tracking_System.src.Shared.Behaviors;
+using System.Text;
 
 namespace Scientific_Journal_Publication_Trend_Tracking_System
 {
@@ -15,9 +25,79 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System
                 options.UseNpgsql(
                     builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // Configure JWT Options
+            builder.Services.Configure<JwtOptions>(
+                builder.Configuration.GetSection(JwtOptions.SectionName));
+
+            //Research Paper Repository
+            builder.Services.AddScoped<IResearchPaperRepository, ResearchPaperRepository>();
+
+            // Add Authentication
+            var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
+            var jwtOptions = jwtSection.Get<JwtOptions>();
+            builder.Services.AddTransient(
+                typeof(IPipelineBehavior<,>),
+                typeof(ValidationBehavior<,>));
+
+            var key = Encoding.ASCII.GetBytes(jwtOptions!.SecretKey);
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = jwtOptions.ValidateIssuerSigningKey,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = jwtOptions.ValidateIssuer,
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidateAudience = jwtOptions.ValidateAudience,
+                    ValidAudience = jwtOptions.Audience,
+                    ValidateLifetime = jwtOptions.ValidateLifetime,
+                    ClockSkew = TimeSpan.FromSeconds(jwtOptions.ClockSkewSeconds)
+                };
+            });
+
+            // Add Authorization
+            builder.Services.AddAuthorization();
+
+            // Add CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
+
+            // Add MediatR
+            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+            // Add FluentValidation
+            builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
+
+
+            // Add AutoMapper
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            // Add Authentication Services
+            builder.Services.AddScoped<IJwtTokenProvider, JwtTokenProvider>();
+            builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+            builder.Services.AddHttpContextAccessor();
+
+            // Add Unit of Work
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -30,10 +110,20 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System
                 app.UseSwaggerUI();
             }
 
+            // Use Global Exception Handling Middleware
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            // Use CORS
+            app.UseCors("AllowAll");
 
+            // Use Routing
+            app.UseRouting();
+
+            // Use Authentication & Authorization
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllers();
 

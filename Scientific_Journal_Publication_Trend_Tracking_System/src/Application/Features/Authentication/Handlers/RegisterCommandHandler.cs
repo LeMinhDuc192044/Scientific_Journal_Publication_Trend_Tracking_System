@@ -18,18 +18,15 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher _passwordHasher;
-    private readonly IMapper _mapper;
     private readonly ILogger<LoginCommandHandler> _logger;
 
     public RegisterCommandHandler(
         IUnitOfWork unitOfWork,
         IPasswordHasher passwordHasher,
-        IMapper mapper,
         ILogger<LoginCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
-        _mapper = mapper;
         _logger = logger;
     }
 

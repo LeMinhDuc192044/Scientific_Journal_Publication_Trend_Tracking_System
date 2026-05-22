@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.Commands;
@@ -8,7 +7,7 @@ using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Authen
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Persistence.Repositories;
 using Scientific_Journal_Publication_Trend_Tracking_System.Shared.Results;
 
-namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Presentation.Controller;
+namespace Scientific_Journal_Publication_Trend_Tracking_System.src.API.Controller;
 
 [ApiController]
 [Route("api/auth")]

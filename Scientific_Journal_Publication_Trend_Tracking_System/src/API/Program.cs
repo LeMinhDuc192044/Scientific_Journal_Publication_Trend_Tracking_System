@@ -1,4 +1,3 @@
-
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,7 +11,7 @@ using Scientific_Journal_Publication_Trend_Tracking_System.Shared.Middleware;
 using Scientific_Journal_Publication_Trend_Tracking_System.src.Shared.Behaviors;
 using System.Text;
 
-namespace Scientific_Journal_Publication_Trend_Tracking_System
+namespace Scientific_Journal_Publication_Trend_Tracking_System.src.API
 {
     public class Program
     {
@@ -34,7 +33,8 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System
 
             // Add Authentication
             var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
-            var jwtOptions = jwtSection.Get<JwtOptions>();
+            var jwtOptions = jwtSection.Get<JwtOptions>() 
+                ?? throw new InvalidOperationException("JWT configuration is missing. Ensure 'Jwt' section exists in appsettings.json");
             builder.Services.AddTransient(
                 typeof(IPipelineBehavior<,>),
                 typeof(ValidationBehavior<,>));

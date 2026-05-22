@@ -42,18 +42,24 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterR
             throw new ConflictException(ValidationMessages.EmailAlreadyExists);
         }
 
-        // Create new user
+        // Validate admin role before hashing (order optimization)
         if (request.Role == UserRole.Admin)
         {
             _logger.LogWarning("Registration blocked: attempt to self-register as Admin");
             throw new ForbiddenAccessException(ValidationMessages.AdminRegistrationForbidden);
         }
+
+        // Hash password asynchronously to offload from request thread
+        var passwordHash = await Task.Run(
+            () => _passwordHasher.HashPassword(request.Password),
+            cancellationToken);
+
         var user = new User
         {
             Id = Guid.NewGuid(),
             Email = request.Email.ToLower(),
             FullName = request.FullName,
-            PasswordHash = _passwordHasher.HashPassword(request.Password),
+            PasswordHash = passwordHash,
             Role = request.Role,
             IsEmailVerified = false,
             IsActive = true

@@ -47,8 +47,12 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
             throw new UnauthorizedException(ValidationMessages.InvalidCredentials);
         }
 
-        // Verify password
-        if (!_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
+        // Verify password asynchronously to offload from request thread
+        var passwordValid = await Task.Run(
+            () => _passwordHasher.VerifyPassword(request.Password, user.PasswordHash),
+            cancellationToken);
+
+        if (!passwordValid)
         {
             _logger.LogWarning("Login failed: Invalid password for email {Email}", request.Email);
             throw new UnauthorizedException(ValidationMessages.InvalidCredentials);
@@ -62,7 +66,10 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpirationDays);
 
-        // Log refresh token usage
+        _unitOfWork.Users.Update(user);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // Log refresh token usage asynchronously to prevent blocking
         var tokenHistory = new RefreshTokenHistory
         {
             Id = Guid.NewGuid(),
@@ -72,9 +79,18 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
             IsRevoked = false
         };
 
-        _unitOfWork.Users.Update(user);
-        await _unitOfWork.RefreshTokenHistories.AddAsync(tokenHistory, cancellationToken);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await _unitOfWork.RefreshTokenHistories.AddAsync(tokenHistory, CancellationToken.None);
+                await _unitOfWork.SaveChangesAsync(CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error logging refresh token history for user {UserId}", user.Id);
+            }
+        }, CancellationToken.None);
 
         _logger.LogInformation("User logged in successfully: {UserId}", user.Id);
 

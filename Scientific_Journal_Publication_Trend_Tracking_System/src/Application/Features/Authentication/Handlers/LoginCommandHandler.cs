@@ -48,9 +48,9 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
         }
 
         // Verify password asynchronously to offload from request thread
-        var passwordValid = await Task.Run(
-            () => _passwordHasher.VerifyPassword(request.Password, user.PasswordHash),
-            cancellationToken);
+        var passwordValid = _passwordHasher.VerifyPassword(
+            request.Password,
+            user.PasswordHash);
 
         if (!passwordValid)
         {
@@ -63,13 +63,14 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
         var refreshToken = _tokenProvider.GenerateRefreshToken();
 
         // Save refresh token
+        // Update user
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpirationDays);
+        user.RefreshTokenExpiryTime =
+            DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpirationDays);
 
         _unitOfWork.Users.Update(user);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Log refresh token usage asynchronously to prevent blocking
+        // Add refresh token history
         var tokenHistory = new RefreshTokenHistory
         {
             Id = Guid.NewGuid(),
@@ -79,18 +80,10 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
             IsRevoked = false
         };
 
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await _unitOfWork.RefreshTokenHistories.AddAsync(tokenHistory, CancellationToken.None);
-                await _unitOfWork.SaveChangesAsync(CancellationToken.None);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error logging refresh token history for user {UserId}", user.Id);
-            }
-        }, CancellationToken.None);
+        await _unitOfWork.RefreshTokenHistories.AddAsync(tokenHistory, cancellationToken);
+
+        // SINGLE SAVE
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("User logged in successfully: {UserId}", user.Id);
 

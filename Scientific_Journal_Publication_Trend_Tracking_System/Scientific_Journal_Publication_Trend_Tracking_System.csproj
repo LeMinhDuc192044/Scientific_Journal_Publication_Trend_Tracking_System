@@ -57,7 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Doc\" />
+    <Folder Include="src\API\Registration\" />
     <Folder Include="src\Infrastructure\Configuration\" />
   </ItemGroup>
 

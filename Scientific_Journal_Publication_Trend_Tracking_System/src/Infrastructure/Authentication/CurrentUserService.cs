@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Authentication;

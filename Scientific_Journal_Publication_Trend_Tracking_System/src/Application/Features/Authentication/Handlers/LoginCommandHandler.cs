@@ -47,8 +47,12 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
             throw new UnauthorizedException(ValidationMessages.InvalidCredentials);
         }
 
-        // Verify password
-        if (!_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
+        // Verify password asynchronously to offload from request thread
+        var passwordValid = _passwordHasher.VerifyPassword(
+            request.Password,
+            user.PasswordHash);
+
+        if (!passwordValid)
         {
             _logger.LogWarning("Login failed: Invalid password for email {Email}", request.Email);
             throw new UnauthorizedException(ValidationMessages.InvalidCredentials);
@@ -59,10 +63,14 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
         var refreshToken = _tokenProvider.GenerateRefreshToken();
 
         // Save refresh token
+        // Update user
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpirationDays);
+        user.RefreshTokenExpiryTime =
+            DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpirationDays);
 
-        // Log refresh token usage
+        _unitOfWork.Users.Update(user);
+
+        // Add refresh token history
         var tokenHistory = new RefreshTokenHistory
         {
             Id = Guid.NewGuid(),
@@ -72,8 +80,9 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
             IsRevoked = false
         };
 
-        _unitOfWork.Users.Update(user);
         await _unitOfWork.RefreshTokenHistories.AddAsync(tokenHistory, cancellationToken);
+
+        // SINGLE SAVE
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("User logged in successfully: {UserId}", user.Id);

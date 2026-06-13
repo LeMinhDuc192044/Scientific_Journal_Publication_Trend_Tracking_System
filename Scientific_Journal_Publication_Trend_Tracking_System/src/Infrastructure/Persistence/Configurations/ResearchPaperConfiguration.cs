@@ -52,6 +52,9 @@ public class ResearchPaperConfiguration : IEntityTypeConfiguration<ResearchPaper
             .WithMany(t => t.ResearchPapers)
             .UsingEntity("PaperTopics");
 
+        builder.HasIndex(x => x.Doi)
+           .IsUnique();
+
         builder.ToTable("ResearchPapers");
     }
 }

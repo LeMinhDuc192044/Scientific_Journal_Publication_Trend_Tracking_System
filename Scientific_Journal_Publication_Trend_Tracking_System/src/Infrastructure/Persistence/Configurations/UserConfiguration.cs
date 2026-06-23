@@ -43,6 +43,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasForeignKey(n => n.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasMany(u => u.FollowSubscriptions)
+            .WithOne(f => f.User)
+            .HasForeignKey(f => f.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.ToTable("Users");
     }
 }

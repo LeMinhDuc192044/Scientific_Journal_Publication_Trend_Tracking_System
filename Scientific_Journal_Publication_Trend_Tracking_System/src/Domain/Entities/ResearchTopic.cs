@@ -19,4 +19,6 @@ public class ResearchTopic : IAuditableEntity
     public ICollection<ResearchPaper> ResearchPapers { get; set; } = new List<ResearchPaper>();
     public ICollection<Keyword> Keywords { get; set; } = new List<Keyword>();
     public ICollection<PublicationTrend> PublicationTrends { get; set; } = new List<PublicationTrend>();
+    public ICollection<FollowSubscription> FollowSubscriptions { get; set; } = new List<FollowSubscription>();
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }

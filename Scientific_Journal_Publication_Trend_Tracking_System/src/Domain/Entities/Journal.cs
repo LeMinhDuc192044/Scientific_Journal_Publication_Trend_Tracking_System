@@ -21,4 +21,6 @@ public class Journal : IAuditableEntity
     public ICollection<ResearchPaper> ResearchPapers { get; set; } = new List<ResearchPaper>();
     public ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
     public ICollection<PublicationTrend> PublicationTrends { get; set; } = new List<PublicationTrend>();
+    public ICollection<FollowSubscription> FollowSubscriptions { get; set; } = new List<FollowSubscription>();
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }

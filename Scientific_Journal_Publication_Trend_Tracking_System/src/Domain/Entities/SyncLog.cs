@@ -12,6 +12,9 @@ public class SyncLog : IAuditableEntity
     public DateTime? ExecutionEndTime { get; set; }
     public bool IsSuccessful { get; set; }
     public int RecordsProcessed { get; set; }
+    public int RecordsCreated { get; set; }
+    public int RecordsUpdated { get; set; }
+    public int NotificationsCreated { get; set; }
     public string? ErrorMessage { get; set; }
     public long ExecutionTimeMs { get; set; }
     public DateTime CreatedAt { get; set; }

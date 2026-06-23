@@ -48,8 +48,9 @@ public class ResearchTopicConfiguration : IEntityTypeConfiguration<ResearchTopic
         builder.HasKey(t => t.Id);
         builder.Property(t => t.Name).IsRequired().HasMaxLength(256);
         builder.Property(t => t.Description).HasMaxLength(1000);
-        builder.HasIndex(t => t.Name);
+        builder.HasIndex(t => t.Name).IsUnique();
         builder.ToTable("ResearchTopics");
+        builder.HasData(DatabaseSeed.ResearchTopics);
     }
 }
 
@@ -95,6 +96,45 @@ public class BookmarkConfiguration : IEntityTypeConfiguration<Bookmark>
     }
 }
 
+public class FollowSubscriptionConfiguration : IEntityTypeConfiguration<FollowSubscription>
+{
+    public void Configure(EntityTypeBuilder<FollowSubscription> builder)
+    {
+        builder.HasKey(f => f.Id);
+
+        builder.HasOne(f => f.User)
+            .WithMany(u => u.FollowSubscriptions)
+            .HasForeignKey(f => f.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(f => f.Journal)
+            .WithMany(j => j.FollowSubscriptions)
+            .HasForeignKey(f => f.JournalId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(f => f.ResearchTopic)
+            .WithMany(t => t.FollowSubscriptions)
+            .HasForeignKey(f => f.ResearchTopicId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(f => new { f.UserId, f.JournalId })
+            .IsUnique()
+            .HasFilter("\"JournalId\" IS NOT NULL");
+
+        builder.HasIndex(f => new { f.UserId, f.ResearchTopicId })
+            .IsUnique()
+            .HasFilter("\"ResearchTopicId\" IS NOT NULL");
+
+        builder.HasIndex(f => new { f.UserId, f.IsActive });
+
+        builder.ToTable("FollowSubscriptions", table =>
+            table.HasCheckConstraint(
+                "CK_FollowSubscriptions_TargetMatchesType",
+                "(\"Type\" = 0 AND \"JournalId\" IS NOT NULL AND \"ResearchTopicId\" IS NULL) OR " +
+                "(\"Type\" = 1 AND \"JournalId\" IS NULL AND \"ResearchTopicId\" IS NOT NULL)"));
+    }
+}
+
 public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
 {
     public void Configure(EntityTypeBuilder<Notification> builder)
@@ -102,8 +142,27 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
         builder.HasKey(n => n.Id);
         builder.Property(n => n.Title).IsRequired().HasMaxLength(256);
         builder.Property(n => n.Message).IsRequired().HasMaxLength(1000);
+
+        builder.HasOne(n => n.RelatedPaper)
+            .WithMany()
+            .HasForeignKey(n => n.RelatedPaperId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasOne(n => n.RelatedJournal)
+            .WithMany(j => j.Notifications)
+            .HasForeignKey(n => n.RelatedJournalId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasOne(n => n.RelatedResearchTopic)
+            .WithMany(t => t.Notifications)
+            .HasForeignKey(n => n.RelatedResearchTopicId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder.HasIndex(n => n.UserId);
-        builder.HasIndex(n => new { n.UserId, n.IsRead });
+        builder.HasIndex(n => new { n.UserId, n.IsRead, n.CreatedAt });
+        builder.HasIndex(n => new { n.UserId, n.RelatedPaperId })
+            .IsUnique()
+            .HasFilter("\"RelatedPaperId\" IS NOT NULL");
         builder.ToTable("Notifications");
     }
 }
@@ -145,6 +204,7 @@ public class ApiDataSourceConfiguration : IEntityTypeConfiguration<ApiDataSource
             .HasForeignKey(s => s.ApiDataSourceId)
             .OnDelete(DeleteBehavior.Cascade);
         builder.ToTable("ApiDataSources");
+        builder.HasData(DatabaseSeed.OpenAlexDataSource);
     }
 }
 
@@ -154,12 +214,15 @@ public class SyncJobConfiguration : IEntityTypeConfiguration<SyncJob>
     {
         builder.HasKey(s => s.Id);
         builder.Property(s => s.JobName).IsRequired().HasMaxLength(256);
+        builder.Property(s => s.SearchQuery).IsRequired().HasMaxLength(500);
+        builder.Property(s => s.BatchSize).HasDefaultValue(100);
         builder.HasMany(s => s.SyncLogs)
             .WithOne(l => l.SyncJob)
             .HasForeignKey(l => l.SyncJobId)
             .OnDelete(DeleteBehavior.Cascade);
         builder.HasIndex(s => s.IsActive);
         builder.ToTable("SyncJobs");
+        builder.HasData(DatabaseSeed.WeeklyAiSyncJob);
     }
 }
 

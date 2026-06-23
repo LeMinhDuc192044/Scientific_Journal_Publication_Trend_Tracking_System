@@ -24,6 +24,7 @@ public class AppDbContext : DbContext
     public DbSet<PublicationTrend> PublicationTrends { get; set; }
     public DbSet<Bookmark> Bookmarks { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<FollowSubscription> FollowSubscriptions { get; set; }
     public DbSet<DashboardReport> DashboardReports { get; set; }
     public DbSet<ApiDataSource> ApiDataSources { get; set; }
     public DbSet<SyncJob> SyncJobs { get; set; }
@@ -40,6 +41,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
         modelBuilder.Entity<Bookmark>().HasQueryFilter(b => !b.IsDeleted);
         modelBuilder.Entity<Notification>().HasQueryFilter(n => !n.IsDeleted);
+        modelBuilder.Entity<FollowSubscription>().HasQueryFilter(f => !f.User.IsDeleted);
 
         // Set default schema
 

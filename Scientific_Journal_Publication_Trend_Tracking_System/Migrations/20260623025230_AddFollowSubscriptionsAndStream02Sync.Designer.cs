@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Persis
 namespace Scientific_Journal_Publication_Trend_Tracking_System.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260623025230_AddFollowSubscriptionsAndStream02Sync")]
+    partial class AddFollowSubscriptionsAndStream02Sync
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

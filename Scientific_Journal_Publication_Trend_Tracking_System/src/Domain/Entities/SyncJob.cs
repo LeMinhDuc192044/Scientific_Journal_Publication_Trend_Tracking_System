@@ -11,6 +11,8 @@ public class SyncJob : IAuditableEntity
     public string JobName { get; set; } = string.Empty;
     public Guid ApiDataSourceId { get; set; }
     public SyncJobStatus Status { get; set; }
+    public string SearchQuery { get; set; } = string.Empty;
+    public int BatchSize { get; set; } = 100;
     public string? CronExpression { get; set; }
     public DateTime? NextScheduledRun { get; set; }
     public DateTime? LastRunTime { get; set; }

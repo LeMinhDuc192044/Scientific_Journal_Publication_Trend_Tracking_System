@@ -16,6 +16,7 @@ public interface IUnitOfWork : IAsyncDisposable
     IRepository<PublicationTrend> PublicationTrends { get; }
     IRepository<Bookmark> Bookmarks { get; }
     IRepository<Notification> Notifications { get; }
+    IRepository<FollowSubscription> FollowSubscriptions { get; }
     IRepository<RefreshTokenHistory> RefreshTokenHistories { get; }
     IRepository<DashboardReport> DashboardReports { get; }
     IRepository<ApiDataSource> ApiDataSources { get; }
@@ -40,6 +41,7 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<PublicationTrend>? _publicationTrendRepository;
     private IRepository<Bookmark>? _bookmarkRepository;
     private IRepository<Notification>? _notificationRepository;
+    private IRepository<FollowSubscription>? _followSubscriptionRepository;
     private IRepository<RefreshTokenHistory>? _refreshTokenHistoryRepository;
     private IRepository<DashboardReport>? _dashboardReportRepository;
     private IRepository<ApiDataSource>? _apiDataSourceRepository;
@@ -60,6 +62,7 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<PublicationTrend> PublicationTrends => _publicationTrendRepository ??= new Repository<PublicationTrend>(_context);
     public IRepository<Bookmark> Bookmarks => _bookmarkRepository ??= new Repository<Bookmark>(_context);
     public IRepository<Notification> Notifications => _notificationRepository ??= new Repository<Notification>(_context);
+    public IRepository<FollowSubscription> FollowSubscriptions => _followSubscriptionRepository ??= new Repository<FollowSubscription>(_context);
     public IRepository<RefreshTokenHistory> RefreshTokenHistories => _refreshTokenHistoryRepository ??= new Repository<RefreshTokenHistory>(_context);
     public IRepository<DashboardReport> DashboardReports => _dashboardReportRepository ??= new Repository<DashboardReport>(_context);
     public IRepository<ApiDataSource> ApiDataSources => _apiDataSourceRepository ??= new Repository<ApiDataSource>(_context);

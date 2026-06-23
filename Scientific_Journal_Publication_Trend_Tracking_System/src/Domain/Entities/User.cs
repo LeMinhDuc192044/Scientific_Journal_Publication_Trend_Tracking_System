@@ -25,6 +25,7 @@ public class User : IAuditableEntity
     public ICollection<RefreshTokenHistory> RefreshTokenHistories { get; set; } = new List<RefreshTokenHistory>();
     public ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
     public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    public ICollection<FollowSubscription> FollowSubscriptions { get; set; } = new List<FollowSubscription>();
 }
 
 public interface IAuditableEntity

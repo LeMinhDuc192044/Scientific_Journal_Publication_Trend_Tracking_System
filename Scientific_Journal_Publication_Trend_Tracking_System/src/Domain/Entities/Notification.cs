@@ -14,13 +14,16 @@ public class Notification : IAuditableEntity
     public string Message { get; set; } = string.Empty;
     public Guid? RelatedPaperId { get; set; }
     public Guid? RelatedJournalId { get; set; }
+    public Guid? RelatedResearchTopicId { get; set; }
     public bool IsRead { get; set; }
     public bool IsDeleted { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    // Navigation property
     public User User { get; set; } = null!;
+    public ResearchPaper? RelatedPaper { get; set; }
+    public Journal? RelatedJournal { get; set; }
+    public ResearchTopic? RelatedResearchTopic { get; set; }
 }
 
 public enum NotificationType

@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.Validators;
+using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Dashboard.Validators;
 using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.ResearchPapers.Validators;
+using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Trends.Validators;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Authentication;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.ExternalApis;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Persistence;
@@ -14,6 +16,7 @@ using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Persis
 using Scientific_Journal_Publication_Trend_Tracking_System.Shared.Middleware;
 using Scientific_Journal_Publication_Trend_Tracking_System.src.Infrastructure.Authentication;
 using Scientific_Journal_Publication_Trend_Tracking_System.src.Infrastructure.BackgroundJobs;
+using Scientific_Journal_Publication_Trend_Tracking_System.src.Infrastructure.Seeding;
 using Scientific_Journal_Publication_Trend_Tracking_System.src.Shared.Behaviors;
 using System.Text;
 
@@ -36,6 +39,7 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.API
 
             //Research Paper Repository
             builder.Services.AddScoped<IResearchPaperRepository, ResearchPaperRepository>();
+            builder.Services.AddScoped<ITrendAnalyticsRepository, TrendAnalyticsRepository>();
 
             // Add Authentication
             var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
@@ -103,6 +107,8 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.API
             // Add FluentValidation
             builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
             builder.Services.AddValidatorsFromAssemblyContaining<SearchPapersRequestValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<GetKeywordTrendQueryValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<GetPublicationsByYearChartQueryValidator>();
 
             // Add AutoMapper
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -192,6 +198,7 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.API
 
             //
             await AdminSeeder.SeedAdminAsync(app.Services);
+            await ResearchTopicSeeder.SeedAsync(app.Services);
 
             // Use Authentication & Authorization
             app.UseAuthentication();

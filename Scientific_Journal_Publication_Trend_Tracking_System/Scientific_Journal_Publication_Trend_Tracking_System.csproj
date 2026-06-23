@@ -4,6 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <DefaultItemExcludes>$(DefaultItemExcludes);artifacts/**</DefaultItemExcludes>
+    <OutputPath Condition="'$(BuildingTests)' == 'true'">out\test-main\</OutputPath>
+    <UseAppHost Condition="'$(BuildingTests)' == 'true'">false</UseAppHost>
   </PropertyGroup>
 
   <ItemGroup>
@@ -59,6 +62,13 @@
   <ItemGroup>
     <Folder Include="src\API\Registration\" />
     <Folder Include="src\Infrastructure\Configuration\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Tests\**" />
+    <Content Remove="Tests\**" />
+    <EmbeddedResource Remove="Tests\**" />
+    <None Remove="Tests\**" />
   </ItemGroup>
 
 </Project>

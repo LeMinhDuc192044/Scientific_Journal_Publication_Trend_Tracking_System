@@ -14,4 +14,5 @@ public class Keyword : IAuditableEntity
     // Navigation properties
     public ICollection<ResearchPaper> ResearchPapers { get; set; } = new List<ResearchPaper>();
     public ICollection<ResearchTopic> ResearchTopics { get; set; } = new List<ResearchTopic>();
+    public ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
 }

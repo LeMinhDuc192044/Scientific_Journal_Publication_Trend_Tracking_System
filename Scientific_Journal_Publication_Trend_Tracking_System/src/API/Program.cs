@@ -5,7 +5,9 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.Handlers;
 using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.Validators;
+using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Bookmarks.Validators;
 using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.ResearchPapers.Validators;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Authentication;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.ExternalApis;
@@ -98,11 +100,12 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.API
 
 
             // Add MediatR
-            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginCommandHandler).Assembly));
 
             // Add FluentValidation
             builder.Services.AddValidatorsFromAssemblyContaining<RegisterCommandValidator>();
             builder.Services.AddValidatorsFromAssemblyContaining<SearchPapersRequestValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<CreateBookmarkRequestValidator>();
 
             // Add AutoMapper
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

@@ -1,3 +1,4 @@
+using FluentValidation;
 using Scientific_Journal_Publication_Trend_Tracking_System.Shared.Results;
 using AppValidEx = Scientific_Journal_Publication_Trend_Tracking_System.Shared.Exceptions.ValidationException;
 using AppAppEx = Scientific_Journal_Publication_Trend_Tracking_System.Shared.Exceptions.ApplicationException;
@@ -48,6 +49,12 @@ public class ExceptionHandlingMiddleware
             statusCode = StatusCodes.Status400BadRequest;
             message = "One or more validation failures have occurred.";
             validationErrors = validEx.Errors.Values.SelectMany(x => x).ToList();
+        }
+        else if (exception is ValidationException fluentValidEx)
+        {
+            statusCode = StatusCodes.Status400BadRequest;
+            message = "One or more validation failures have occurred.";
+            validationErrors = fluentValidEx.Errors.Select(e => e.ErrorMessage).ToList();
         }
         else if (exception is AppUnauthorizedEx)
         {

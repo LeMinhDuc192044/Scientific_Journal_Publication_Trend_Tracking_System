@@ -90,7 +90,14 @@ public class BookmarkConfiguration : IEntityTypeConfiguration<Bookmark>
             .OnDelete(DeleteBehavior.SetNull);
         builder.HasOne(b => b.ResearchTopic)
             .WithMany()
+            .HasForeignKey(b => b.ResearchTopicId)
             .OnDelete(DeleteBehavior.SetNull);
+        builder.HasOne(b => b.Keyword)
+            .WithMany(k => k.Bookmarks)
+            .HasForeignKey(b => b.KeywordId)
+            .OnDelete(DeleteBehavior.SetNull);
+        builder.HasIndex(b => new { b.UserId, b.Type, b.ResearchPaperId });
+        builder.HasIndex(b => new { b.UserId, b.Type, b.KeywordId });
         builder.ToTable("Bookmarks");
     }
 }

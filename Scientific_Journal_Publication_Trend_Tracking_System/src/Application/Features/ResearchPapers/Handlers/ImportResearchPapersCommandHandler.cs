@@ -1,11 +1,13 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.ResearchPapers.DTOs;
 using Scientific_Journal_Publication_Trend_Tracking_System.Domain.Entities;
 using Scientific_Journal_Publication_Trend_Tracking_System.Domain.Enums;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.ExternalApis;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Persistence;
 using Scientific_Journal_Publication_Trend_Tracking_System.src.Application.Features.ResearchPapers.Commands;
 using Scientific_Journal_Publication_Trend_Tracking_System.src.Infrastructure.ExternalApis.ExternalPaperDto;
+using System.Threading;
 
 namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.Features.ResearchPapers.Handlers
 {
@@ -24,6 +26,13 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.F
             _db = db;
             _logger = logger;
         }
+
+        //-- --------------------------------------------------------------------------
+        //private async Task<ResearchPaperDto> AddResearchPaperByLink(ImportResearchPapersByLinksCommand dto, CancellationToken cancellationToken)
+        //{
+        //    IReadOnlyList<ExternalPaperDto> papers;
+            
+        //}
 
         public async Task<ImportPapersResult> Handle(
             ImportResearchPapersCommand request,
@@ -212,6 +221,11 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.F
             _db.Authors.Add(author);
             return author;
         }
+
+        
+
+
+
 
         // ── Domain inference: score keywords against known signals ────────────────
 

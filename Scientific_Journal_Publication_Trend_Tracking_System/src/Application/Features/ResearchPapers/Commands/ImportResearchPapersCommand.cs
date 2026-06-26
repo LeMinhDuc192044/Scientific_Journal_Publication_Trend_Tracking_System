@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Scientific_Journal_Publication_Trend_Tracking_System.Domain.Enums;   
+using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.ResearchPapers.DTOs;
 
 namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.Features.ResearchPapers.Commands;
 
@@ -14,4 +16,10 @@ public record ImportPapersResult(
     IReadOnlyList<string> Errors
 );
 
+
+public record ImportResearchPapersByLinksCommand(
+    string Link,
+    string ApiSource,
+    ResearchDomain ResearchDomain
+) : IRequest<ResearchPaperDto>;
 

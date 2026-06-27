@@ -1,10 +1,8 @@
-using FluentValidation;
+﻿using FluentValidation;
 using Hangfire;
 using Hangfire.PostgreSql;
 using MediatR;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.Handlers;
 using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.Validators;
 using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Dashboard.Validators;
@@ -19,7 +17,6 @@ using Scientific_Journal_Publication_Trend_Tracking_System.src.Infrastructure.Au
 using Scientific_Journal_Publication_Trend_Tracking_System.src.Infrastructure.BackgroundJobs;
 using Scientific_Journal_Publication_Trend_Tracking_System.src.Infrastructure.Seeding;
 using Scientific_Journal_Publication_Trend_Tracking_System.src.Shared.Behaviors;
-using System.Text;
 
 namespace Scientific_Journal_Publication_Trend_Tracking_System.src.API
 {
@@ -34,47 +31,16 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.API
                 options.UseNpgsql(
                     builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Configure JWT Options
-            builder.Services.Configure<JwtOptions>(
-                builder.Configuration.GetSection(JwtOptions.SectionName));
-
             //Research Paper Repository
             builder.Services.AddScoped<IResearchPaperRepository, ResearchPaperRepository>();
             builder.Services.AddScoped<ITrendAnalyticsRepository, TrendAnalyticsRepository>();
 
-            // Add Authentication
-            var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
-            var jwtOptions = jwtSection.Get<JwtOptions>() 
-                ?? throw new InvalidOperationException("JWT configuration is missing. Ensure 'Jwt' section exists in appsettings.json");
             builder.Services.AddTransient(
                 typeof(IPipelineBehavior<,>),
                 typeof(ValidationBehavior<,>));
 
-            var key = Encoding.UTF8.GetBytes(jwtOptions!.SecretKey);
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = jwtOptions.ValidateIssuerSigningKey,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = jwtOptions.ValidateIssuer,
-                    ValidIssuer = jwtOptions.Issuer,
-                    ValidateAudience = jwtOptions.ValidateAudience,
-                    ValidAudience = jwtOptions.Audience,
-                    ValidateLifetime = jwtOptions.ValidateLifetime,
-                    ClockSkew = TimeSpan.FromSeconds(jwtOptions.ClockSkewSeconds)
-                };
-            });
-
-            // Add Authorization
-            builder.Services.AddAuthorization();
+            // ── JWT Authentication + Authorization (extracted to extension method) ──
+            builder.Services.AddJwtAuthentication(builder.Configuration);
 
             // Add CORS
             builder.Services.AddCors(options =>
@@ -183,13 +149,22 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.API
                     options.RoutePrefix = string.Empty;
                     options.DefaultModelsExpandDepth(0);
                     options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+                    options.EnablePersistAuthorization(); // keeps the Bearer token across page reloads/restarts
                 });
             }
 
             // Use Global Exception Handling Middleware
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-            app.UseHttpsRedirection();
+            // Only force HTTPS redirection outside Development.
+            // (See note above: redirecting http→https on localhost crosses a
+            // port/origin boundary, and browsers strip the Authorization
+            // header on cross-origin redirects — this was silently breaking
+            // Bearer auth when testing via Swagger over http://localhost:5220.)
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
 
             // Use CORS
             app.UseCors("AllowAll");

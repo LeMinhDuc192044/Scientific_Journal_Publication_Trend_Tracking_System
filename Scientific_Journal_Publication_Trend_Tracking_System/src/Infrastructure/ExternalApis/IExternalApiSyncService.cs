@@ -11,4 +11,5 @@ public interface IExternalApiSyncService
     Task<List<ExternalPaperDto>> SearchSemanticScholarAsync(string query, int limit = 100, CancellationToken cancellationToken = default);
     Task<List<ExternalPaperDto>> SearchOpenAlexAsync(string query, int limit = 100, CancellationToken cancellationToken = default);
     Task<List<ExternalPaperDto>> SearchCrossrefAsync(string query, int limit = 100, CancellationToken cancellationToken = default);
+    Task<ExternalPaperDto?> GetByLinkAsync(string link, string apiSource, CancellationToken cancellationToken = default);
 }

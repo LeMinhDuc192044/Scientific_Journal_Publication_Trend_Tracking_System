@@ -12,7 +12,6 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.API.Controlle
 [ApiController]
 [Route("api/research-papers")]
 [Produces("application/json")]
-[Authorize]
 public class ResearchPaperController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -22,6 +21,20 @@ public class ResearchPaperController : ControllerBase
         _mediator = mediator;
     }
 
+    [HttpPost("import-single")]
+    [ProducesResponseType(typeof(ImportSinglePaperResult), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ImportSingle(
+        [FromBody] ImportResearchPaperByLinkCommand command,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(command, cancellationToken);
+        return StatusCode(StatusCodes.Status201Created, result);
+    }
+
     /// <summary>
     /// Search research papers with filters and pagination
     /// </summary>
@@ -29,7 +42,7 @@ public class ResearchPaperController : ControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Paginated list of research papers</returns>
     [HttpPost("search")]
-    [AllowAnonymous]
+    [Authorize(Roles = "Admin,User,Researcher")]
     [ProducesResponseType(typeof(ApiResponse<SearchPapersResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<SearchPapersResponse>), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse<SearchPapersResponse>>> SearchPapers(
@@ -62,6 +75,7 @@ public class ResearchPaperController : ControllerBase
     [ProducesResponseType(typeof(ImportPapersResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status502BadGateway)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Import(
         [FromBody] ImportResearchPapersCommand command,
         CancellationToken cancellationToken)
@@ -81,7 +95,7 @@ public class ResearchPaperController : ControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Research paper details</returns>
     [HttpGet("{id}")]
-    [AllowAnonymous]
+    [Authorize(Roles = "Admin,User,Researcher")]
     [ProducesResponseType(typeof(ApiResponse<ResearchPaperDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<ResearchPaperDto>), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<ResearchPaperDto>>> GetPaperDetails(
@@ -111,7 +125,7 @@ public class ResearchPaperController : ControllerBase
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of popular research papers</returns>
     [HttpGet("popular/{topCount?}")]
-    [AllowAnonymous]
+    [Authorize(Roles = "Admin,Researcher")]
     [ProducesResponseType(typeof(ApiResponse<List<ResearchPaperDto>>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<List<ResearchPaperDto>>>> GetPopularPapers(
         [FromRoute] int topCount = 10,

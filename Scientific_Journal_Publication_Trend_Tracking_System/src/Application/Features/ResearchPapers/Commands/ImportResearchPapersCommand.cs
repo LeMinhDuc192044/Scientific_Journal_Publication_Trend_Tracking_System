@@ -17,9 +17,17 @@ public record ImportPapersResult(
 );
 
 
-public record ImportResearchPapersByLinksCommand(
+public record ImportResearchPaperByLinkCommand(
     string Link,
     string ApiSource,
-    ResearchDomain ResearchDomain
-) : IRequest<ResearchPaperDto>;
+    List<Guid> ResearchTopicIds
+) : IRequest<ImportSinglePaperResult>;
 
+public record ImportSinglePaperResult(
+    Guid PaperId,
+    string Title,
+    int CitationCount,
+    string? JournalName,
+    List<string> AuthorNames,
+    List<string> LinkedTopicNames
+);

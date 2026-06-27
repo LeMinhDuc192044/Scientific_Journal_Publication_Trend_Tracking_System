@@ -27,16 +27,11 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.F
             _logger = logger;
         }
 
-        //-- --------------------------------------------------------------------------
-        //private async Task<ResearchPaperDto> AddResearchPaperByLink(ImportResearchPapersByLinksCommand dto, CancellationToken cancellationToken)
-        //{
-        //    IReadOnlyList<ExternalPaperDto> papers;
-            
-        //}
+        
 
         public async Task<ImportPapersResult> Handle(
             ImportResearchPapersCommand request,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken )
         {
             var errors = new List<string>();
             var imported = 0;

@@ -1,38 +1,76 @@
-﻿    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
-    using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.ExternalApis.SemanticScholar;
-    using Scientific_Journal_Publication_Trend_Tracking_System.src.Infrastructure.ExternalApis.ExternalPaperDto;
-    using System.Text.Json;
-    using System.Text.Json.Nodes;
+﻿
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.ExternalApis.SemanticScholar;
+using Scientific_Journal_Publication_Trend_Tracking_System.src.Infrastructure.ExternalApis.ExternalPaperDto;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
-    namespace Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.ExternalApis;
+namespace Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.ExternalApis;
 
-    public class ExternalApiSyncService : IExternalApiSyncService
+public class ExternalApiSyncService : IExternalApiSyncService
+{
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<ExternalApiSyncService> _logger;
+    private readonly IConfiguration _configuration;
+
+    private const string SemanticScholarBaseUrl = "https://api.semanticscholar.org/graph/v1/paper/search";
+    private const string OpenAlexBaseUrl = "https://api.openalex.org/works";
+    private const string CrossrefBaseUrl = "https://api.crossref.org/works";
+    private const string PoliteMail = "sit96leminhduc@example.com";
+
+
+    private static readonly JsonSerializerOptions JsonOpts =
+        new() { PropertyNameCaseInsensitive = true };
+
+    public ExternalApiSyncService(
+        HttpClient httpClient,
+        ILogger<ExternalApiSyncService> logger,
+        IConfiguration configuration)
     {
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<ExternalApiSyncService> _logger;
-        private readonly IConfiguration _configuration;
+        _httpClient = httpClient;
+        _logger = logger;
+        _configuration = configuration;
+    }
 
-        private const string SemanticScholarBaseUrl = "https://api.semanticscholar.org/graph/v1/paper/search";
-        private const string OpenAlexBaseUrl = "https://api.openalex.org/works";
-        private const string CrossrefBaseUrl = "https://api.crossref.org/works";
+    public async Task<ExternalPaperDto?> GetByLinkAsync(
+            string link, string apiSource, CancellationToken cancellationToken = default)
+    {
+        var identifier = ExtractIdentifier(link, apiSource);
 
-        private static readonly JsonSerializerOptions JsonOpts =
-            new() { PropertyNameCaseInsensitive = true };
-
-        public ExternalApiSyncService(
-            HttpClient httpClient,
-            ILogger<ExternalApiSyncService> logger,
-            IConfiguration configuration)
+        return apiSource.ToLower() switch
         {
-            _httpClient = httpClient;
-            _logger = logger;
-            _configuration = configuration;
+            "semanticscholar" => await GetSemanticScholarByIdAsync(identifier, cancellationToken),
+            "openalex" => await GetOpenAlexByIdAsync(identifier, cancellationToken),
+            "crossref" => await GetCrossrefByDoiAsync(identifier, cancellationToken),
+            _ => throw new ArgumentException($"Unknown source '{apiSource}'.")
+        };
+    }
+
+    /// - A doi.org URL → the raw DOI (e.g. "10.1145/3442188.3445922")
+    /// - A raw DOI already starting with "10." → returned as-is
+    /// - Anything else (an OpenAlex ID, S2 paper ID, etc.) → returned as-is, trimmed
+    /// </summary>
+    private static string ExtractIdentifier(string link, string apiSource)
+    {
+        link = link.Trim();
+
+        if (Uri.TryCreate(link, UriKind.Absolute, out var uri))
+        {
+            if (uri.Host.Contains("doi.org", StringComparison.OrdinalIgnoreCase))
+                return uri.AbsolutePath.TrimStart('/');
+
+            // OpenAlex URL form: https://openalex.org/W2741809807 → take the ID segment
+            if (apiSource == "openalex" && uri.Host.Contains("openalex.org", StringComparison.OrdinalIgnoreCase))
+                return uri.Segments.Last();
         }
 
-        // ── Semantic Scholar ──────────────────────────────────────────────────────
+        return link;
+    }
 
-        public async Task<List<ExternalPaperDto>> SearchSemanticScholarAsync(
+    // ── Semantic Scholar ──────────────────────────────────────────────────────
+
+    public async Task<List<ExternalPaperDto>> SearchSemanticScholarAsync(
             string query, int limit = 100, CancellationToken cancellationToken = default)
         {
             var url = $"{SemanticScholarBaseUrl}" +
@@ -54,8 +92,77 @@
                    ?? [];
         }
 
-        // Maps YOUR SemanticScholarPaperResponse → shared ExternalPaperDto
-        private static ExternalPaperDto MapSemanticScholar(SemanticScholarPaperResponse p) => new(
+
+    private async Task<ExternalPaperDto?> GetSemanticScholarByIdAsync(
+    string identifier, CancellationToken ct)
+    {
+        // S2 supports prefixed identifiers: DOI:<doi>, ARXIV:<id>, or a raw S2 paperId
+        var s2Id = identifier.StartsWith("10.", StringComparison.Ordinal)
+            ? $"DOI:{identifier}"
+            : identifier;
+
+        var url = $"{SemanticScholarBaseUrl}/{Uri.EscapeDataString(s2Id)}" +
+                  "?fields=paperId,title,abstract,year,keywords,authors,url,citationCount,venue";
+
+        _logger.LogInformation("Calling Semantic Scholar single-paper lookup: {Url}", url);
+
+        var response = await _httpClient.GetAsync(url, ct);
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync(ct);
+        var paper = JsonSerializer.Deserialize<SemanticScholarPaperResponse>(content, JsonOpts);
+
+        return paper is null ? null : MapSemanticScholar(paper);
+    }
+
+    private async Task<ExternalPaperDto?> GetOpenAlexByIdAsync(
+        string identifier, CancellationToken ct)
+    {
+        // OpenAlex accepts "doi:<doi>" or a native OpenAlex ID (e.g. W2741809807)
+        var oaId = identifier.StartsWith("10.", StringComparison.Ordinal)
+            ? $"doi:{identifier}"
+            : identifier;
+
+        var url = $"{OpenAlexBaseUrl}/{Uri.EscapeDataString(oaId)}?mailto={PoliteMail}";
+
+        _logger.LogInformation("Calling OpenAlex single-paper lookup: {Url}", url);
+
+        var response = await _httpClient.GetAsync(url, ct);
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync(ct);
+        var work = JsonNode.Parse(content);
+
+        return work is null ? null : MapOpenAlex(work);
+    }
+
+    private async Task<ExternalPaperDto?> GetCrossrefByDoiAsync(
+        string identifier, CancellationToken ct)
+    {
+        if (!identifier.StartsWith("10.", StringComparison.Ordinal))
+            throw new ArgumentException(
+                "Crossref lookup requires a DOI (e.g. 10.1145/xxxx). " +
+                $"The link/identifier provided ('{identifier}') isn't a DOI.");
+
+        var url = $"{CrossrefBaseUrl}/{Uri.EscapeDataString(identifier)}?mailto={PoliteMail}";
+
+        _logger.LogInformation("Calling Crossref single-paper lookup: {Url}", url);
+
+        var response = await _httpClient.GetAsync(url, ct);
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+        response.EnsureSuccessStatusCode();
+
+        var content = await response.Content.ReadAsStringAsync(ct);
+        var json = JsonNode.Parse(content);
+        var item = json?["message"];
+
+        return item is null ? null : MapCrossref(item);
+    }
+
+    // Maps YOUR SemanticScholarPaperResponse → shared ExternalPaperDto
+    private static ExternalPaperDto MapSemanticScholar(SemanticScholarPaperResponse p) => new(
             PaperId: p.PaperId,
             Title: p.Title,
             Abstract: p.Abstract,

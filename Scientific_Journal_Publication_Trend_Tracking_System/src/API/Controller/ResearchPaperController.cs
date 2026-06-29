@@ -75,6 +75,31 @@ public class ResearchPaperController : ControllerBase
     }
 
     /// <summary>
+    /// Backfill research topic mappings for existing papers.
+    /// Requires Admin role.
+    /// </summary>
+    /// <param name="command">Backfill options</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Backfill result with matched and skipped counts</returns>
+    [HttpPost("topics/backfill")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(ApiResponse<BackfillResearchPaperTopicsResult>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<BackfillResearchPaperTopicsResult>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<ApiResponse<BackfillResearchPaperTopicsResult>>> BackfillTopics(
+        [FromBody] BackfillResearchPaperTopicsCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _mediator.Send(command, cancellationToken);
+
+        return Ok(ApiResponse<BackfillResearchPaperTopicsResult>.Ok(
+            result,
+            result.DryRun
+                ? $"Topic backfill dry run completed. Candidate links: {result.LinksCreated}"
+                : $"Topic backfill completed. Links created: {result.LinksCreated}"));
+    }
+
+    /// <summary>
     /// Get research paper details by ID
     /// </summary>
     /// <param name="id">Research paper ID</param>

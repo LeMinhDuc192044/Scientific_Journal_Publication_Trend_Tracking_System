@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.Authentication.Validators;
 using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.ResearchPapers.Validators;
+using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.ResearchPapers.Services;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Authentication;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.ExternalApis;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Persistence;
@@ -95,6 +96,7 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.API
             builder.Services.AddHangfireServer();
 
             builder.Services.AddScoped<SyncResearchPapersJob>();
+            builder.Services.AddScoped<IResearchTopicMatcher, ResearchTopicMatcher>();
 
 
             // Add MediatR

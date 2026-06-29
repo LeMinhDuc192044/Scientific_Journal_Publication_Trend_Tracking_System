@@ -59,3 +59,18 @@ public class SyncResearchPapersCommandValidator : AbstractValidator<SyncResearch
             .WithMessage("Limit must be between 1 and 1000");
     }
 }
+
+public sealed class BackfillResearchPaperTopicsCommandValidator
+    : AbstractValidator<BackfillResearchPaperTopicsCommand>
+{
+    public BackfillResearchPaperTopicsCommandValidator()
+    {
+        RuleFor(x => x.MaxTopicsPerPaper)
+            .InclusiveBetween(1, 5)
+            .WithMessage("MaxTopicsPerPaper must be between 1 and 5");
+
+        RuleFor(x => x.BatchSize)
+            .InclusiveBetween(1, 5000)
+            .WithMessage("BatchSize must be between 1 and 5000");
+    }
+}

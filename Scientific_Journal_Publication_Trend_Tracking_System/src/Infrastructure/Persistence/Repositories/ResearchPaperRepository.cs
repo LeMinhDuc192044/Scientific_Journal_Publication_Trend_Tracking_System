@@ -73,6 +73,7 @@ public class ResearchPaperRepository : Repository<ResearchPaper>, IResearchPaper
             .Take(pageSize)
             .Include(p => p.Journal)
             .Include(p => p.Authors)
+            .Include(p => p.ResearchTopics)
             .ToListAsync(cancellationToken);
     }
 
@@ -124,6 +125,7 @@ public class ResearchPaperRepository : Repository<ResearchPaper>, IResearchPaper
             .Take(topCount)
             .Include(p => p.Journal)
             .Include(p => p.Authors)
+            .Include(p => p.ResearchTopics)
             .ToListAsync(cancellationToken);
     }
 
@@ -136,6 +138,7 @@ public class ResearchPaperRepository : Repository<ResearchPaper>, IResearchPaper
             .Take(pageSize)
             .Include(p => p.Journal)
             .Include(p => p.Authors)
+            .Include(p => p.ResearchTopics)
             .ToListAsync(cancellationToken);
     }
 }

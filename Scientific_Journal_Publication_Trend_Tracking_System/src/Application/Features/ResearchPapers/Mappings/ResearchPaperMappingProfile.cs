@@ -13,10 +13,13 @@ public class ResearchPaperMappingProfile : Profile
     {
         CreateMap<ResearchPaper, ResearchPaperDto>()
             .ForMember(dest => dest.Journal, opt => opt.MapFrom(src => src.Journal))
-            .ForMember(dest => dest.Authors, opt => opt.MapFrom(src => src.Authors));
+            .ForMember(dest => dest.Authors, opt => opt.MapFrom(src => src.Authors))
+            .ForMember(dest => dest.Topics, opt => opt.MapFrom(src => src.ResearchTopics));
 
         CreateMap<Journal, JournalDto>();
 
         CreateMap<Author, AuthorDto>();
+
+        CreateMap<ResearchTopic, ResearchTopicDto>();
     }
 }

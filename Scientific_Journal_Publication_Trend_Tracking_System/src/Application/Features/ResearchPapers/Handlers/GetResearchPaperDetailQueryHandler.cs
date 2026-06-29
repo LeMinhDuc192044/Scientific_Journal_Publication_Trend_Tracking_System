@@ -27,6 +27,7 @@ public class GetResearchPaperDetailQueryHandler : IRequestHandler<GetResearchPap
             .AsNoTracking()
             .Include(p => p.Journal)
             .Include(p => p.Authors)
+            .Include(p => p.ResearchTopics)
             .FirstOrDefaultAsync(p => p.Id == request.PaperId, cancellationToken);
 
         if (paper == null)

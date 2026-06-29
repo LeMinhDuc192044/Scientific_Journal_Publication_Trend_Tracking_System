@@ -17,6 +17,7 @@ public record ResearchPaperDto
     public ResearchDomain Domain { get; init; }
     public JournalDto? Journal { get; init; }
     public List<AuthorDto> Authors { get; init; } = new();
+    public List<ResearchTopicDto> Topics { get; init; } = new();
 }
 
 /// <summary>
@@ -39,6 +40,16 @@ public record AuthorDto
     public string FullName { get; init; } = string.Empty;
     public string? Email { get; init; }
     public string? Orcid { get; init; }
+}
+
+/// <summary>
+/// DTO for a research topic linked to a paper.
+/// </summary>
+public record ResearchTopicDto
+{
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public ResearchDomain Domain { get; init; }
 }
 
 /// <summary>

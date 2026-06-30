@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.ResearchPapers.Commands;
+using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.ResearchPapers.Services;
 using Scientific_Journal_Publication_Trend_Tracking_System.Domain.Entities;
 using Scientific_Journal_Publication_Trend_Tracking_System.Domain.Enums;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.ExternalApis;
@@ -15,7 +16,7 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.F
 /// from external APIs (title, abstract, keywords, year, citationCount, authors, journal).
 ///
 /// - Papers that exist in the DB (matched by ExternalId + ApiSource) → UPDATED
-/// - Papers returned by the API that are not yet in the DB → SKIPPED (use Import for that)
+/// - Papers returned by the API that are not yet in the DB → CREATED
 /// - Full-text is never fetched (copyright + storage constraints)
 /// </summary>
 public class SyncResearchPapersCommandHandler
@@ -23,15 +24,18 @@ public class SyncResearchPapersCommandHandler
 {
     private readonly IExternalApiSyncService _externalApiService;
     private readonly AppDbContext _dbContext;
+    private readonly IResearchTopicMatcher _topicMatcher;
     private readonly ILogger<SyncResearchPapersCommandHandler> _logger;
 
     public SyncResearchPapersCommandHandler(
         IExternalApiSyncService externalApiService,
         AppDbContext dbContext,
+        IResearchTopicMatcher topicMatcher,
         ILogger<SyncResearchPapersCommandHandler> logger)
     {
         _externalApiService = externalApiService;
         _dbContext = dbContext;
+        _topicMatcher = topicMatcher;
         _logger = logger;
     }
 
@@ -40,8 +44,9 @@ public class SyncResearchPapersCommandHandler
         CancellationToken cancellationToken)
     {
         var errors = new List<string>();
+        var created = 0;
         var updated = 0;
-        var skipped = 0; // returned by API but not in our DB — not our data to update
+        var topicLinksCreated = 0;
 
         _logger.LogInformation(
             "Starting sync for query: '{Query}' from {ApiSource}",
@@ -80,23 +85,44 @@ public class SyncResearchPapersCommandHandler
         _logger.LogInformation("Fetched {Count} papers from {Source}",
             papers.Count, request.ApiSource);
 
-        // ── 2. Update each paper that already exists in the DB ────────────────
+        var topics = await _dbContext.ResearchTopics
+            .OrderBy(t => t.Name)
+            .ToListAsync(cancellationToken);
+
+        var paperIds = papers
+            .Select(p => p.PaperId)
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .Distinct()
+            .ToList();
+
+        var existingPapers = await _dbContext.ResearchPapers
+            .Include(p => p.Authors)
+            .Include(p => p.Journal)
+            .Include(p => p.ResearchTopics)
+            .Where(p => p.ApiSource == request.ApiSource && paperIds.Contains(p.ExternalId))
+            .ToListAsync(cancellationToken);
+
+        var existingPapersByExternalId = existingPapers
+            .GroupBy(p => p.ExternalId)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        // ── 2. Upsert each paper returned by the external API ────────────────
         foreach (var paperDto in papers)
         {
             try
             {
-                var existing = await _dbContext.ResearchPapers
-                    .Include(p => p.Authors)
-                    .Include(p => p.Journal)
-                    .FirstOrDefaultAsync(
-                        p => p.ExternalId == paperDto.PaperId &&
-                             p.ApiSource == request.ApiSource,
+                if (!existingPapersByExternalId.TryGetValue(paperDto.PaperId, out var existing))
+                {
+                    var newPaper = await BuildPaperAsync(
+                        paperDto,
+                        request.ApiSource,
+                        topics,
                         cancellationToken);
 
-                // Not in our DB — skip (this is Sync, not Import)
-                if (existing is null)
-                {
-                    skipped++;
+                    topicLinksCreated += newPaper.ResearchTopics.Count;
+                    _dbContext.ResearchPapers.Add(newPaper);
+                    existingPapersByExternalId[paperDto.PaperId] = newPaper;
+                    created++;
                     continue;
                 }
 
@@ -131,6 +157,23 @@ public class SyncResearchPapersCommandHandler
                     }
                 }
 
+                var existingTopicIds = existing.ResearchTopics
+                    .Select(t => t.Id)
+                    .ToHashSet();
+
+                var matchedTopics = _topicMatcher
+                    .MatchTopics(existing, topics, maxTopics: 3)
+                    .Where(t => !existingTopicIds.Contains(t.Id))
+                    .ToList();
+
+                foreach (var topic in matchedTopics)
+                {
+                    existing.ResearchTopics.Add(topic);
+                    topic.PapersCount++;
+                    topic.UpdatedAt = DateTime.UtcNow;
+                    topicLinksCreated++;
+                }
+
                 updated++;
             }
             catch (Exception ex)
@@ -145,10 +188,57 @@ public class SyncResearchPapersCommandHandler
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
-            "Sync complete — updated: {U}, skipped (not in DB): {S}, errors: {E}",
-            updated, skipped, errors.Count);
+            "Sync complete — created: {C}, updated: {U}, topic links created: {T}, errors: {E}",
+            created, updated, topicLinksCreated, errors.Count);
 
-        return new SyncPapersResponse(updated, 0, updated, errors);
+        return new SyncPapersResponse(created + updated, created, updated, errors, topicLinksCreated);
+    }
+
+    private async Task<ResearchPaper> BuildPaperAsync(
+        ExternalPaperDto dto,
+        string apiSource,
+        IReadOnlyCollection<ResearchTopic> topics,
+        CancellationToken ct)
+    {
+        var paper = new ResearchPaper
+        {
+            Id = Guid.NewGuid(),
+            ExternalId = dto.PaperId,
+            ApiSource = apiSource,
+            Title = dto.Title,
+            Abstract = dto.Abstract,
+            Keywords = dto.Keywords ?? [],
+            PublicationYear = dto.Year ?? DateTime.UtcNow.Year,
+            Doi = dto.Doi,
+            Url = dto.Url,
+            CitationCount = dto.CitationCount ?? 0,
+            Domain = InferDomain(dto.Keywords, dto.Title),
+            IsFullTextAvailable = false,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        if (!string.IsNullOrWhiteSpace(dto.JournalName))
+        {
+            paper.Journal = await GetOrAddJournalAsync(dto.JournalName, ct);
+        }
+
+        if (dto.Authors is { Count: > 0 })
+        {
+            foreach (var authorDto in dto.Authors)
+            {
+                paper.Authors.Add(await GetOrAddAuthorAsync(authorDto, ct));
+            }
+        }
+
+        foreach (var topic in _topicMatcher.MatchTopics(paper, topics, maxTopics: 3))
+        {
+            paper.ResearchTopics.Add(topic);
+            topic.PapersCount++;
+            topic.UpdatedAt = DateTime.UtcNow;
+        }
+
+        return paper;
     }
 
     // ── Journal: reuse by title, create if missing ────────────────────────────
@@ -223,5 +313,33 @@ public class SyncResearchPapersCommandHandler
         };
         _dbContext.Authors.Add(author);
         return author;
+    }
+
+    private static readonly Dictionary<ResearchDomain, string[]> Signals = new()
+    {
+        [ResearchDomain.ComputerScience] =
+        [
+            "machine learning", "neural network", "deep learning", "algorithm",
+            "artificial intelligence", "nlp", "computer vision", "data mining",
+            "software", "computing", "cybersecurity"
+        ],
+
+        [ResearchDomain.ArtificialIntelligence] =
+        [
+            "artificial intelligence", "machine learning", "deep learning",
+            "neural network", "computer vision", "natural language processing",
+            "reinforcement learning", "transformer", "llm", "generative ai"
+        ]
+    };
+
+    private static ResearchDomain InferDomain(string[]? keywords, string? title)
+    {
+        var text = string.Join(" ", (keywords ?? []).Append(title ?? string.Empty))
+            .ToLowerInvariant();
+
+        return Signals
+            .OrderByDescending(kv => kv.Value.Count(text.Contains))
+            .First()
+            .Key;
     }
 }

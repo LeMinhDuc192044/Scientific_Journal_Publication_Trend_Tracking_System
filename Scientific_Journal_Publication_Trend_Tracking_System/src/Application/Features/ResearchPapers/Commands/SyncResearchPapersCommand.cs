@@ -17,4 +17,5 @@ public record SyncPapersResponse(
     int TotalSynced,
     int TotalCreated,
     int TotalUpdated,
-    List<string> Errors);
+    List<string> Errors,
+    int TopicLinksCreated = 0);

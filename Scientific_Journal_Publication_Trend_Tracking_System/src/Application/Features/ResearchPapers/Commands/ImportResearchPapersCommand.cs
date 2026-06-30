@@ -11,7 +11,8 @@ public record ImportResearchPapersCommand(
 public record ImportPapersResult(
     int Imported,
     int Skipped,       // already existed (ExternalId match)
-    IReadOnlyList<string> Errors
+    IReadOnlyList<string> Errors,
+    int TopicLinksCreated = 0
 );
 
 

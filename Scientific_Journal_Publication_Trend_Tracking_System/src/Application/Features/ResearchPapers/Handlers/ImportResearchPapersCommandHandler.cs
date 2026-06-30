@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Scientific_Journal_Publication_Trend_Tracking_System.Domain.Entities;
 using Scientific_Journal_Publication_Trend_Tracking_System.Domain.Enums;
+using Scientific_Journal_Publication_Trend_Tracking_System.Application.Features.ResearchPapers.Services;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.ExternalApis;
 using Scientific_Journal_Publication_Trend_Tracking_System.Infrastructure.Persistence;
 using Scientific_Journal_Publication_Trend_Tracking_System.src.Application.Features.ResearchPapers.Commands;
@@ -13,15 +14,18 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.F
     {
         private readonly IExternalApiSyncService _api;
         private readonly AppDbContext _db;
+        private readonly IResearchTopicMatcher _topicMatcher;
         private readonly ILogger<ImportResearchPapersCommandHandler> _logger;
 
         public ImportResearchPapersCommandHandler(
             IExternalApiSyncService api,
             AppDbContext db,
+            IResearchTopicMatcher topicMatcher,
             ILogger<ImportResearchPapersCommandHandler> logger)
         {
             _api = api;
             _db = db;
+            _topicMatcher = topicMatcher;
             _logger = logger;
         }
 
@@ -32,6 +36,7 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.F
             var errors = new List<string>();
             var imported = 0;
             var skipped = 0;
+            var topicLinksCreated = 0;
 
             // ── 1. Fetch from external API ────────────────────────────────────────
             _logger.LogInformation(
@@ -63,24 +68,39 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.F
             _logger.LogInformation("Fetched {Count} papers from {Source}",
                 papers.Count, request.ApiSource);
 
+            var topics = await _db.ResearchTopics
+                .OrderBy(t => t.Name)
+                .ToListAsync(cancellationToken);
+
+            var paperIds = papers
+                .Select(p => p.PaperId)
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Distinct()
+                .ToList();
+
+            var existingExternalIdList = await _db.ResearchPapers
+                .Where(p => p.ApiSource == request.ApiSource && paperIds.Contains(p.ExternalId))
+                .Select(p => p.ExternalId)
+                .ToListAsync(cancellationToken);
+
+            var existingExternalIds = existingExternalIdList.ToHashSet();
+
             // ── 2. Insert each paper ──────────────────────────────────────────────
             foreach (var dto in papers)
             {
                 try
                 {
                     // Skip if already imported (e.g. duplicate query was run before)
-                    var alreadyExists = await _db.ResearchPapers.AnyAsync(
-                        p => p.ExternalId == dto.PaperId && p.ApiSource == request.ApiSource,
-                        cancellationToken);
-
-                    if (alreadyExists)
+                    if (existingExternalIds.Contains(dto.PaperId))
                     {
                         skipped++;
                         continue;
                     }
 
-                    var paper = await BuildPaperAsync(dto, request.ApiSource, cancellationToken);
+                    var paper = await BuildPaperAsync(dto, request.ApiSource, topics, cancellationToken);
+                    topicLinksCreated += paper.ResearchTopics.Count;
                     _db.ResearchPapers.Add(paper);
+                    existingExternalIds.Add(dto.PaperId);
                     imported++;
                 }
                 catch (Exception ex)
@@ -94,10 +114,10 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.F
             // ── 3. Save all at once ───────────────────────────────────────────────
             await _db.SaveChangesAsync(cancellationToken);
             _logger.LogInformation(
-                "Import done — imported: {I}, skipped: {S}, errors: {E}",
-                imported, skipped, errors.Count);
+                "Import done — imported: {I}, skipped: {S}, topic links created: {T}, errors: {E}",
+                imported, skipped, topicLinksCreated, errors.Count);
 
-            return new ImportPapersResult(imported, skipped, errors);
+            return new ImportPapersResult(imported, skipped, errors, topicLinksCreated);
         }
 
         // ── Build a new ResearchPaper from the external DTO ───────────────────────
@@ -105,6 +125,7 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.F
         private async Task<ResearchPaper> BuildPaperAsync(
             ExternalPaperDto dto,
             string apiSource,
+            IReadOnlyCollection<ResearchTopic> topics,
             CancellationToken ct)
         {
             var paper = new ResearchPaper
@@ -133,6 +154,13 @@ namespace Scientific_Journal_Publication_Trend_Tracking_System.src.Application.F
             if (dto.Authors is { Count: > 0 })
                 foreach (var a in dto.Authors)
                     paper.Authors.Add(await GetOrAddAuthorAsync(a, ct));
+
+            foreach (var topic in _topicMatcher.MatchTopics(paper, topics, maxTopics: 3))
+            {
+                paper.ResearchTopics.Add(topic);
+                topic.PapersCount++;
+                topic.UpdatedAt = DateTime.UtcNow;
+            }
 
             return paper;
         }
